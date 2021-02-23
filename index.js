@@ -1,20 +1,11 @@
 require("dotenv").config();
-const Tx = require("ethereumjs-tx");
 const Web3 = require("web3");
-const {
-  ChainId,
-  Fetcher,
-  WETH,
-  Route,
-  Trade,
-  TokenAmount,
-  TradeType,
-  Percent,
-} = require("@uniswap/sdk");
+const { ChainId, Fetcher, WETH } = require("@uniswap/sdk");
 const ethers = require("ethers");
 const abiDecoder = require("abi-decoder");
 const exchangeABI = require("./abi").exchangeABI;
-const Account = require('./account.js').Account;
+const Account = require("./account.js");
+const Common = require("./staticVariables.js");
 
 abiDecoder.addABI(exchangeABI);
 
@@ -23,6 +14,8 @@ let web3;
 let chainId;
 let tokenOwnerAccount;
 let buyerAccount;
+let token;
+let weth;
 
 const {
   RPC_URL_MAINNET,
@@ -38,7 +31,7 @@ const {
   TEST_NETWORK_CHAIN_ID,
 } = process.env;
 
-function initialize() {
+async function initialize() {
   //Initialize web3
   if (USE_TEST_NETWORK) {
     chainId = ChainId[TEST_NETWORK_CHAIN_ID];
@@ -57,10 +50,19 @@ function initialize() {
     );
     web3 = new Web3(RPC_URL_MAINNET_WSS);
   }
+  //initialize token
+  token = await Fetcher.fetchTokenData(chainId, TOKEN_ADDRESS, provider);
+  weth = WETH[chainId];
 
   //Initialize accounts
-  tokenOwnerAccount = new Account(TOKEN_OWNER_ACCOUNT, TOKEN_OWNER_PRIVATE_KEY, provider);
-  buyerAccount = new Account(BUYER_ACCOUNT, BUYER_PRIVATE_KEY, provider);
+  //initialize the static variables
+  Common.set({ provider, weth, token, web3 });
+
+  tokenOwnerAccount = new Account(TOKEN_OWNER_ACCOUNT, TOKEN_OWNER_PRIVATE_KEY);
+  /*  buyerAccount = new Account(
+    BUYER_ACCOUNT,
+    BUYER_PRIVATE_KEY,
+  );*/
 }
 
 async function startListening() {
@@ -82,8 +84,13 @@ async function startListening() {
 }
 
 async function parseTransactionData(transaction) {
-    console.log(transaction);
+  //console.log(transaction);
 }
 
-initialize();
-startListening();
+async function run() {
+  await initialize();
+  startListening();
+  setTimeout(() => tokenOwnerAccount.addLiquidityETH("0.001"), 3000);
+}
+
+run();
