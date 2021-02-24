@@ -6,6 +6,7 @@ const abiDecoder = require("abi-decoder");
 const exchangeABI = require("./abi").exchangeABI;
 const Account = require("./account.js");
 const Common = require("./staticVariables.js");
+const fs = require("fs");
 
 abiDecoder.addABI(exchangeABI);
 
@@ -59,10 +60,7 @@ async function initialize() {
   Common.set({ provider, weth, token, web3 });
 
   tokenOwnerAccount = new Account(TOKEN_OWNER_ACCOUNT, TOKEN_OWNER_PRIVATE_KEY);
-  /*  buyerAccount = new Account(
-    BUYER_ACCOUNT,
-    BUYER_PRIVATE_KEY,
-  );*/
+  buyerAccount = new Account( BUYER_ACCOUNT, BUYER_PRIVATE_KEY);
 }
 
 async function startListening() {
@@ -84,13 +82,27 @@ async function startListening() {
 }
 
 async function parseTransactionData(transaction) {
-  //console.log(transaction);
+  const  transactionInput = transaction.input;
+  fs.appendFileSync("transactionDetails.txt", "Pending transaction "+Date.now()+"\n"+JSON.stringify(transaction)+"\n");
+  const trxMethod = transactionInput.toLowerCase().substring(0,10);
+  if (trxMethod === "0xf305d719"){ // addLiquidityETH
+    const token = transactionInput.toLowerCase().substring(34,74);
+    if (token === TOKEN_ADDRESS.toLowerCase().substring(2,TOKEN_ADDRESS.length)){
+      //buyerAccount.swapExactETHForTokens();
+      const decodedData = abiDecoder.decodeMethod(transactionInput);
+      buyerAccount.swapExactETHForTokensOnInitialAddLiquidity(decodedData, transaction);
+      //buyerAccount.swapExactETHForTokens(decodedData, transaction);
+      fs.appendFileSync("transactionDetails.txt", "Pending transaction "+Date.now()+"\n"+JSON.stringify(transaction)+"\n");
+    }
+  }
 }
 
 async function run() {
   await initialize();
   startListening();
+  //setTimeout(() => tokenOwnerAccount.addLiquidityETH("1.0"), 3000);
   setTimeout(() => tokenOwnerAccount.addLiquidityETH("0.001"), 3000);
+  //setTimeout(() => buyerAccount.swapExactETHForTokens(), 3000);
 }
 
 run();
