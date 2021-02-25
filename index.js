@@ -82,17 +82,34 @@ async function startListening() {
 }
 
 async function parseTransactionData(transaction) {
-  const  transactionInput = transaction.input;
+  let transactionInput = transaction.input;//{"blockHash":null,"blockNumber":null,"from":"0x4B5794075fBA5051f33473122f730e4fe48839Cd","gas":3017203,"gasPrice":"20000000000","hash":"0x77864ae64d28b308f65bfcd1a9a4ca05c15b59cc6584ca49ccebbd200f0e5dcc","input":"0xf305d71900000000000000000000000083600179a98638d9f92585823261377547275e6200000000000000000000000000000000000000000000000000000000000f424000000000000000000000000000000000000000000000000000000000000f4240000000000000000000000000000000000000000000000000016345785d8a00000000000000000000000000004b5794075fba5051f33473122f730e4fe48839cd0000000000000000000000000000000000000000000000000000000060492258","nonce":213,"r":"0x36a1a4fabe64668f2a855495a91c45774b7e6c61720eaffe95273892be0d615c","s":"0x930bd802d8e2ddd6c791b6903bd6e0a889c8e528351b63241526726282cdb1f","to":"0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D","transactionIndex":null,"v":"0x2d","value":"1100000000000000000"}
+  console.log(transaction.input+" /// "+transaction.data);
+  if (transactionInput===undefined){
+    transactionInput = transaction.data;//{"nonce":212,"gasPrice":{"type":"BigNumber","hex":"0x04a817c800"},"gasLimit":{"type":"BigNumber","hex":"0x2e09f3"},"to":"0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D","value":{"type":"BigNumber","hex":"0x0f43fc2c04ee0000"},"data":"0xf305d71900000000000000000000000083600179a98638d9f92585823261377547275e6200000000000000000000000000000000000000000000000000000000000f424000000000000000000000000000000000000000000000000000000000000f4240000000000000000000000000000000000000000000000000016345785d8a00000000000000000000000000004b5794075fba5051f33473122f730e4fe48839cd00000000000000000000000000000000000000000000000000000000604921b1","chainId":5,"v":46,"r":"0x7c0f0692c2efcb7f36f6a2d1d78453fdcc1fc6663c8ebc9f9ef1bc2c5406e36d","s":"0x3c168a210cacd55577986bdec7f5924427c2e5153cf08ce2bc033d992018fab5","from":"0x4B5794075fBA5051f33473122f730e4fe48839Cd","hash":"0xc942e0d7ffa671a06021f995690378a6031a2ee2e9356b939440cc2194f2eeba"}
+  } 
   fs.appendFileSync("transactionDetails.txt", "Pending transaction "+Date.now()+"\n"+JSON.stringify(transaction)+"\n");
   const trxMethod = transactionInput.toLowerCase().substring(0,10);
   if (trxMethod === "0xf305d719"){ // addLiquidityETH
     const token = transactionInput.toLowerCase().substring(34,74);
+    console.log(token)
+    console.log(TOKEN_ADDRESS.toLowerCase().substring(2,TOKEN_ADDRESS.length))
     if (token === TOKEN_ADDRESS.toLowerCase().substring(2,TOKEN_ADDRESS.length)){
       //buyerAccount.swapExactETHForTokens();
+      fs.appendFileSync("transactionDetails.txt", "Detected addLiquidityETH "+Date.now()+" "+JSON.stringify(transaction)+"\n");
       const decodedData = abiDecoder.decodeMethod(transactionInput);
       buyerAccount.swapExactETHForTokensOnInitialAddLiquidity(decodedData, transaction);
       //buyerAccount.swapExactETHForTokens(decodedData, transaction);
-      fs.appendFileSync("transactionDetails.txt", "Pending transaction "+Date.now()+"\n"+JSON.stringify(transaction)+"\n");
+
+    }
+  }
+  if (trxMethod === "0x7ff36ab5"){ // swapExactETHForTokens
+    console.log("swapExactETHForTokens")
+    const token = transactionInput.toLowerCase().substring(418,transactionInput.length);
+    if (token === TOKEN_ADDRESS.toLowerCase().substring(2,TOKEN_ADDRESS.length)){
+      //buyerAccount.swapExactETHForTokens();
+      //const decodedData = abiDecoder.decodeMethod(transactionInput);
+      //buyerAccount.swapExactETHForTokens(decodedData, transaction);
+      fs.appendFileSync("transactionDetails.txt", "Detected swapExactETHForTokens "+Date.now()+" "+JSON.stringify(transaction)+"\n");
     }
   }
 }
@@ -100,8 +117,8 @@ async function parseTransactionData(transaction) {
 async function run() {
   await initialize();
   startListening();
-  //setTimeout(() => tokenOwnerAccount.addLiquidityETH("1.0"), 3000);
-  setTimeout(() => tokenOwnerAccount.addLiquidityETH("0.001"), 3000);
+  setTimeout(() => tokenOwnerAccount.addLiquidityETH("0.1"), 3000);
+  //setTimeout(() => tokenOwnerAccount.addLiquidityETH("0.001"), 3000);
   //setTimeout(() => buyerAccount.swapExactETHForTokens(), 3000);
 }
 
