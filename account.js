@@ -36,7 +36,8 @@ module.exports = class Account {
     );
     const tx = await this.uniswap.addLiquidityETH(
       token.address,
-      1000000,  1000000,
+      //1000000,  1000000,//0.1 eth
+      100000,  10000,
     //   1000, 100,
       _ethAmountMin,
       this.accountHash,
@@ -57,17 +58,19 @@ module.exports = class Account {
       "transactionDetails.txt",
       "ADD LIQUIDITY TRANSACTION SENT " + Date.now() + " \n" + JSON.stringify(tx) + "\n"
     );
-    let trxReceipt = null;
+    /*let trxReceipt = null;
     while (trxReceipt == null) {
       trxReceipt = await web3.eth.getTransactionReceipt(tx.hash);
       await sleep(1000);
-    }
-    console.log(`addLiquidityETH hash: ${tx.hash}`);
+    }*/
+    const trxReceipt = await tx.wait();
+    console.log("ADD LIQUIDITY MINED "+ trxReceipt.status + " BLOCK NUMBER:" + trxReceipt.blockNumber + " POSITION: "+trxReceipt.transactionIndex);
     fs.appendFileSync(
       "transactionDetails.txt",
-      "ADD LIQUIDITY MINED "+tx.hash + " " + trxReceipt.status + " BLOCK NUMBER:" + trxReceipt.blockNumber + "\n"
+      "ADD LIQUIDITY MINED "+tx.hash + " " + trxReceipt.status + " BLOCK NUMBER:" + trxReceipt.blockNumber + " TRA\n"
     );
-    console.log("\x1b[1m%s\x1b[0m", "Complete!");
+    process.exit(1);
+    //console.log("\x1b[1m%s\x1b[0m", "Complete!");
   }
 
   async swapExactETHForTokens(decodedData, transaction) {
@@ -80,7 +83,7 @@ module.exports = class Account {
       TradeType.EXACT_INPUT
     );
     console.log("\x1b[42m%s\x1b[0m", "swapExactETHForTokens " + Date.now());
-    const slippageTolerance = new Percent("5000", "10000"); // 50 bips 1 bip = 0.001 %
+    const slippageTolerance = new Percent("50000", "10000"); // 50 bips 1 bip = 0.001 %
     const amountOutMin = trade.minimumAmountOut(slippageTolerance).raw;
     const amountOutMinHex = ethers.BigNumber.from(amountOutMin.toString()).toHexString();
     const path = [weth.address, token.address];
@@ -110,6 +113,7 @@ module.exports = class Account {
       {
         value:inputAmountHex,
         gasPrice: transaction.gasPrice,
+        gasLimit: 150000
       }
     );
     console.log(`Transaction hash: ${tx.hash}`);
@@ -118,8 +122,7 @@ module.exports = class Account {
       `swapExactETHForTokens SENT ${Date.now()}, transaction hash: ${tx.hash}\n`
     );
     const receipt = await tx.wait();
-    console.log(`Transaction was mined in block
-     ${receipt.blockNumber}`);
+    console.log("swapExactETHForTokensMINED "+ receipt.status + " BLOCK NUMBER:" + receipt.blockNumber + " POSITION: "+receipt.transactionIndex);
     fs.appendFileSync(
       "transactionDetails.txt",
       `swapExactETHForTokens transaction was mined in block ${receipt.blockNumber}\n`
