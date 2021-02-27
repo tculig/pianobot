@@ -1,0 +1,9 @@
+quikNode - $9.00, nema goerli
+alchemy - 2 sec slower
+blockcypher - internal testnet
+nodesmith - internal testnet
+blocknative - 
+running your own node - 
+getblock - no testnet
+pocket - internal testnet
+chainstack - asks for credit card details

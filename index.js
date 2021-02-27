@@ -66,16 +66,21 @@ async function initialize() {
   tokenOwnerAccount = new Account(TOKEN_OWNER_ACCOUNT, TOKEN_OWNER_PRIVATE_KEY);
   buyerAccount = new Account( BUYER_ACCOUNT, BUYER_PRIVATE_KEY);
 }
-
+let hashCount = 0;
+let transCount = 0;
 async function startListening() {
   subscription = web3.eth
     .subscribe("pendingTransactions", function (error, result) {})
     .on("data", function (transactionHash) {
+      hashCount++;
       web3.eth
         .getTransaction(transactionHash)
         .then(function (transaction) {
+          transCount++;
           if (transaction) {
             parseTransactionData(transaction);
+          }else{
+            console.log("FAILED TO FETCH TRANSACTION!!!")
           }
         })
         .catch((error) => {

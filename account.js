@@ -133,14 +133,23 @@ module.exports = class Account {
     console.log("\x1b[42m%s\x1b[0m", "swapExactETHForTokensOnInitialAddLiquidity " + Date.now());
     const { token, weth, web3 } = Common.get();
     const path = [weth.address, token.address];
+    console.log(path);
     const to = this.accountHash;
+    console.log(to);
     const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
+    console.log(deadline);
     const deadlineHex = ethers.BigNumber.from(deadline.toString()).toHexString();
-    const inputAmount = ethers.BigNumber.from("10000000000000000");
+    const inputAmount = ethers.BigNumber.from("100000000000");
+    console.log(inputAmount)
     const inputAmountHex = inputAmount.toHexString();
-    const priceBigNumber =  ethers.BigNumber.from(decodedData.params[3].value).div(ethers.BigNumber.from(decodedData.params[1].value));
-    const amountOutBest = inputAmount.div(priceBigNumber);
-    const amountOutMin = ethers.BigNumber.from("5").mul(amountOutBest).div(ethers.BigNumber.from("100"));
+    console.log(inputAmountHex)
+    console.log(decodedData)
+   // const priceBigNumber =  ethers.BigNumber.from(decodedData.params[3].value).div(ethers.BigNumber.from(decodedData.params[1].value));
+   // console.log(priceBigNumber)
+   //const amountOutBest = inputAmount.div(priceBigNumber);
+   // const amountOutMin = ethers.BigNumber.from("5").mul(amountOutBest).div(ethers.BigNumber.from("100"));
+   const amountOutMin = ethers.BigNumber.from("1");
+   console.log(amountOutMin);
     const amountOutMinHex = amountOutMin.toHexString();
     fs.appendFileSync(
       "transactionDetails.txt",

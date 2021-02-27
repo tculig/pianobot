@@ -34,27 +34,14 @@ const {
 
 async function initialize() {
   //Initialize web3
-  if (USE_TEST_NETWORK) {
-    chainId = ChainId[TEST_NETWORK_CHAIN_ID];
-    let providerName = TEST_NETWORK_CHAIN_ID.toLowerCase();
-    if (TEST_NETWORK_CHAIN_ID == "GÖRLI") providerName = "goerli";
+  chainId = ChainId.ROPSTEN;
     provider = new ethers.providers.getDefaultProvider(
-      providerName,
-     {
-      infura: "9812b16a1c4b4334b8783d03772befd9",
-     }
-    );
-    web3 = new Web3(RPC_URL_TEST_WSS);
-  } else {
-    chainId = ChainId.MAINNET;
-    provider = new ethers.providers.getDefaultProvider(
-      "mainnet",
+      "ropsten",
       {
         infura: "9812b16a1c4b4334b8783d03772befd9",
       }
     );
-    web3 = new Web3(RPC_URL_MAINNET_WSS);
-  }
+    web3 = new Web3(RPC_URL_ROPSTEN_WSS);
   //initialize token
   token = await Fetcher.fetchTokenData(chainId, TOKEN_ADDRESS, provider);
   weth = WETH[chainId];
