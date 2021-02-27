@@ -51,10 +51,9 @@ async function initialize() {
   tokenOwnerAccount = new Account(TOKEN_OWNER_ACCOUNT, TOKEN_OWNER_PRIVATE_KEY);
 }
 
-
 async function run() {
   await initialize();
-  setTimeout(() => tokenOwnerAccount.addLiquidityETH("0.01"), 5000);
+  setInterval(() => tokenOwnerAccount.addLiquidityETH("0.01"), 10000);
 }
 
 run();

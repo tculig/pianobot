@@ -13,7 +13,7 @@ module.exports = class Common {
   static add(newValues) {
     Common.obj  = {
         ...Common.obj,
-        newValues
+        ...newValues
     }
   }
 };
