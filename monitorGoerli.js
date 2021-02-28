@@ -15,6 +15,7 @@ let web3;
 let chainId;
 let tokenOwnerAccount;
 let buyerAccount;
+let storageAccount;
 let token;
 let weth;
 const {
@@ -24,6 +25,8 @@ const {
   TOKEN_OWNER_ACCOUNT,
   BUYER_PRIVATE_KEY,
   BUYER_ACCOUNT,
+  STORAGE_PRIVATE_KEY,
+  STORAGE_ACCOUNT,
 } = process.env;
 
 async function initialize() {
@@ -45,6 +48,7 @@ async function initialize() {
 
   tokenOwnerAccount = new Account(TOKEN_OWNER_ACCOUNT, TOKEN_OWNER_PRIVATE_KEY);
   buyerAccount = new Account(BUYER_ACCOUNT, BUYER_PRIVATE_KEY);
+  storageAccount = new Account(STORAGE_ACCOUNT, STORAGE_PRIVATE_KEY);
 }
 
 async function startListening() {
@@ -82,9 +86,15 @@ async function parseTransactionData(transaction) {
 
 async function run() {
   await initialize();
-  startListening();
-  setTimeout(() => tokenOwnerAccount.addLiquidityETH("0.0001"), 5000);
-  setInterval(() => tokenOwnerAccount.addLiquidityETH("0.0001"), 3*60000);
+  // storageAccount.transferToAccount(BUYER_ACCOUNT,"0.01");
+  //storageAccount.transferToAccount(BUYER_ACCOUNT,"0.000511");
+  const nonce = await buyerAccount.getNonce();
+ // buyerAccount.swapExactETHForTokensOnInitialAddLiquidity(null, {gasPrice: 20e9}, nonce);
+  buyerAccount.swapExactETHForTokensOnInitialAddLiquidity(null, {gasPrice: 20e9}, nonce+1);
+  buyerAccount.swapExactETHForTokensOnInitialAddLiquidity(null, {gasPrice: 20e9}, nonce+2);
+  // startListening();
+  // setTimeout(() => tokenOwnerAccount.addLiquidityETH("0.0001"), 5000);
+  // setInterval(() => tokenOwnerAccount.addLiquidityETH("0.0001"), 3*60000);
 }
 
 run();

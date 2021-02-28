@@ -30,6 +30,7 @@ module.exports = class Account {
     const { provider } = Common.get();
     const privateKeyHex = new Buffer.from(privateKey, "hex");
     const signer = new ethers.Wallet(privateKeyHex, provider);
+    this.signer = signer;
     this.uniswap = new ethers.Contract(
       EXCHANGE_ADDRESS,
       [
@@ -42,7 +43,7 @@ module.exports = class Account {
     this.accountHash = accountHash;
   }
   async addLiquidityETH(ETH_AMOUNT) {
-    const { token, web3 } = Common.get();
+    const { token } = Common.get();
     const deadline = Math.floor(Date.now() / 1000) + 60 * 20*1000;
     const deadlineHex = ethers.BigNumber.from(deadline.toString()).toHexString();
     const _ethAmount = ethers.utils.parseEther(ETH_AMOUNT);
@@ -73,14 +74,18 @@ module.exports = class Account {
     console.log("\x1b[42m%s\x1b[0m", "ADD LIQUIDITY MINED "+ !!trxReceipt.status + " BLOCK NUMBER:" + trxReceipt.blockNumber + " POSITION: "+trxReceipt.transactionIndex+" TIME TAKEN: "+(Date.now()-startTime)/1000+" seconds");
   }
 
-  async swapExactETHForTokensOnInitialAddLiquidity(decodedData, transaction) {
+  async getNonce() {
+    return await this.signer.getTransactionCount();
+  }
+
+  async swapExactETHForTokensOnInitialAddLiquidity(decodedData, transaction, nonce) {
     console.log("\x1b[44m%s\x1b[0m", "swapExactETHForTokens " + Date.now());
     const { token, weth, web3 } = Common.get();
     const path = [weth.address, token.address];
     const to = this.accountHash;
     const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
     const deadlineHex = ethers.BigNumber.from(deadline.toString()).toHexString();
-    const inputAmount = ethers.BigNumber.from("10000000000000");
+    const inputAmount = ethers.BigNumber.from(ethers.utils.parseEther("0.001"));
     const inputAmountHex = inputAmount.toHexString();
    // const priceBigNumber =  ethers.BigNumber.from(decodedData.params[3].value).div(ethers.BigNumber.from(decodedData.params[1].value));
    // const amountOutBest = inputAmount.div(priceBigNumber);
@@ -95,15 +100,16 @@ module.exports = class Account {
       {
         value:inputAmountHex,
         gasPrice: transaction.gasPrice,
-        gasLimit: 140000
+        gasLimit: 200000,
+        nonce
       }
     );
     console.log("\x1b[44m%s\x1b[0m", "SWAP SENT "+tx.hash);
     const trxReceipt = await tx.wait();
+    console.log("Gas used: "+trxReceipt.gasUsed.toNumber())
     console.log("\x1b[44m%s\x1b[0m", "swapExactETHForTokens MINED "+ !!trxReceipt.status + " BLOCK NUMBER:" + trxReceipt.blockNumber + " POSITION: "+trxReceipt.transactionIndex);
+    while(Stat.get().addLiquidityInProgress) await sleep(100);
     let stat = Stat.get();
-    if(stat.addLiquidityInProgress) await sleep(1000);
-    stat = Stat.get();
     if(stat.addLiquidityInProgress){
       console.log("\x1b[31m%s\x1b[0m", "ADD LIQUIDITY STILL IN PROGRESS!");
     }
@@ -125,7 +131,7 @@ module.exports = class Account {
     const route = new Route([pair], weth);
     const trade = new Trade(
       route,
-      new TokenAmount(weth, "10000000000000000"),
+      new TokenAmount(weth, ethers.utils.parseEther("0.001")),
       TradeType.EXACT_INPUT
     );
     console.log("\x1b[42m%s\x1b[0m", "swapExactETHForTokens " + Date.now());
@@ -156,4 +162,19 @@ module.exports = class Account {
    }
 
   async swapExactTokensForETH() {}
+
+  async transferToAccount(receiver, valueToSend) {
+    console.log("\x1b[42m%s\x1b[0m", "Sending funds..");
+    const tx = {
+      to: receiver,
+      value: ethers.utils.parseEther(valueToSend)
+    }
+    const resposne = await this.signer.sendTransaction(tx);
+    const receipt = await resposne.wait();
+    if(receipt.status!=1){
+      console.log("\x1b[31m%s\x1b[0m", "Transfer to buy account failed!!!");
+    }else{
+      console.log("\x1b[42m%s\x1b[0m", "Transfered the funds boss");
+    }
+  }
 };
