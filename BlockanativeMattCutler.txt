@@ -1,0 +1,153 @@
+TihomirToday at 10:38 PM
+aha
+now it works
+so, hello
+quick overview of my issue:
+Your platform works perfectly for monitoring to and from addresses. Its very fast, faster than anything else on the market. What our requirement is to be able to "sniff" specific addLiquidity calls from uniswap. This requires the transaction input to be parsed with an abi and the token address extracted.
+As far as I can tell, you don't offer this functionality out of the box
+What looked like the solution to me was to use the blocknative.configuration call via SDK, but I don't seem to understand how it works because I can't get it to do anything
+Whatever I put in as parametes I always get "[Error [TimeoutError]: Timeout has occurred]"
+Is this making any sense to you?
+An illustration I send Sean via email was that I can actually get this information If I'm monitoring the specific address that adds liquidity:
+emitter.on("all", transaction => {
+    console.log(transaction)
+  })
+returns:
+status: 'pending',
+    monitorId: 'GETH_5_A_PROD',
+    monitorVersion: '0.79.13',
+    pendingTimeStamp: '2021-03-02T10:50:27.146Z',
+    pendingBlockNumber: 4373546,
+    hash: '0xc3fbb892f0bce8f75bac70b90a88e24d56415c7b08be5cabd56e8fe088c9d909',
+    from: '0xc5df691DFAF10fdbB9a0b26BD824EAb57896cC2B',
+    to: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
+    value: '100000000000000',
+    gas: 3017203,
+    gasPrice: '20000000000',
+    nonce: 109,
+    blockHash: null,
+    blockNumber: null,
+    input: '0xf305d7190000000000000000000000005004a3451118625e52dc7aa4427152dd38a2dd630000000000000000000000000000000000000000000000000000000000002710000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000005af3107a4000000000000000000000000000c5df691dfaf10fdbb9a0b26bd824eab57896cc2b00000000000000000000000000000000000000000000000000000000605067f1',
+    asset: '',
+    watchedAddress: '0xc5df691dfaf10fdbb9a0b26bd824eab57896cc2b',
+    direction: 'outgoing',
+    counterparty: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
+    serverVersion: '0.93.3',
+    eventCode: 'txPool',
+    timeStamp: '2021-03-02T10:50:27.141Z',
+    system: 'ethereum',
+    network: 'goerli',
+    contractCall: {
+      contractType: 'Uniswap V2: Router02',
+      contractAddress: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
+      methodName: 'addLiquidityETH',
+      params: {
+        token: '0x5004A3451118625e52DC7aA4427152Dd38A2dD63',
+        amountTokenDesired: '10000',
+        amountTokenMin: '1',
+        amountETHMin: '100000000000000',
+        to: '0xc5df691DFAF10fdbB9a0b26BD824EAb57896cC2B',
+        deadline: '1615882225'
+      }
+    }
+Under contractCall.params.token is the address that we want to monitor
+Matt Cutler | BlocknativeToday at 10:46 PM
+Hi @Tihomir here is a Mempool Explorer stream that monitors the Uniswap v2 Router contract for the addLiquidity Contract Call. Is this close to the data stream you are looking for? https://tinyurl.com/yazyk5yt
+Mempool Explorer
+Mempool Explorer
+Build real-time event streams with Mempool Explorer from Blocknative. Fast, flexible, and easy-to-integrate with your blockchain projects and trading strategies.
+
+TihomirToday at 10:47 PM
+It does look like it might be...
+Can you give me 15 minutes to take a closer look?
+Matt Cutler | BlocknativeToday at 10:47 PM
+Of course
+TihomirToday at 10:47 PM
+thanks
+Matt Cutler | BlocknativeToday at 10:49 PM
+Mempool Explorer provides lots of flexibility in terms of monitoring for specific contract calls. Note that there is also a bunch of subtlety around how things work (Subscription Filters vs. Global filters for instance) as well as ABI support (we happen to automatically decode the Uniswap V2 Router on the fly).
+This video will walk you through how to save a Mempool Explorer configuration to one of your API Keys (associated with your Blocknative Account) so you can write out the event stream to a webhook. https://www.youtube.com/watch?v=8gXdvPes5F0&feature=youtu.be
+YouTube
+Blocknative
+Mempool Explorer [#3] — Composability Via Webhooks
+
+TihomirToday at 10:52 PM
+thank you Matt, I'll rummage through it, I failed to understand the subtleties of the mempool explorer. I should be able to set this up in under an hour to confirm.
+Matt Cutler | BlocknativeToday at 10:54 PM
+All good. Def worth watching the other tutorial videos linked on the right when in default view.
+TihomirToday at 11:02 PM
+So it works fine for confirmations, but it doesn't give me the transaction when its in status "pending".
+Why is that?
+Matt Cutler | BlocknativeToday at 11:58 PM
+Are you trying to monitor Contract Calls on internal transactions?
+Matt Cutler | BlocknativeToday at 12:00 AM
+Today, internal transactions are indeterminate until they are confirmed. Hence, the Ethereum network itself does not have any concept of a 'pending internal transaction'. As a result, the current generation of our platform can only detect these events on Confirmation.
+With that said...
+We have built a real-time Simulation Platform that changes this.
+This capability is fully operational today but not yet generally available.
+TihomirToday at 12:01 AM
+I see...
+Matt Cutler | BlocknativeToday at 12:01 AM
+We plan to introduce our Simulation Platform before the end the month.
+TihomirToday at 12:01 AM
+Well, this is fantastic
+Matt Cutler | BlocknativeToday at 12:01 AM
+This will calculate 'pending internal transactions' on the fly
+TihomirToday at 12:01 AM
+Will it be available for the lowest tear subscribers?
+Matt Cutler | BlocknativeToday at 12:01 AM
+This will be premium service – we are working on the exact pricing structure for this capability now.
+TihomirToday at 12:01 AM
+aha
+I must say I am interested
+Matt Cutler | BlocknativeToday at 12:02 AM
+It is computationally intensive and requires significant dedicated hardware resources to support.
+TihomirToday at 12:02 AM
+Understandably
+Where can I get notice when this becomes available?
+Matt Cutler | BlocknativeToday at 12:03 AM
+We have invested heavily in making it high performance – including our custom low-latency simulation environment
+TihomirToday at 12:03 AM
+This sounds exactly what we need
+Matt Cutler | BlocknativeToday at 12:03 AM
+We will announce it on our #announcements channel here in Discord. And via Twitter (@blocknative). And via our blog. When it is available, we will not be bashful about it. :wink:
+TihomirToday at 12:04 AM
+Excellent!
+Thank you very much for your help Matt, I hope to be a happy customer in the near future
+:slight_smile:
+Matt Cutler | BlocknativeToday at 12:04 AM
+Here is sample of 50 Uniswap simulation payloads. Note that these can be rather verbose. Please do not share.
+Attachment file type: code
+Uniswap_TX_SIM_Sample_2.3.2021_CONFIDENTIAL.json
+324.58 KB
+TihomirToday at 12:04 AM
+Will not share..
+Matt Cutler | BlocknativeToday at 12:04 AM
+What are you building?
+TihomirToday at 12:05 AM
+I couple of friends are convinced that we can make some money by backrunning some ethereum ICOs
+I'm not hopeful, but I'm only in charge of the technical aspect
+Matt Cutler | BlocknativeToday at 12:05 AM
+You will notice that the Event Status for these API payloads is set to "pending-simulation-alpha"
+TihomirToday at 12:06 AM
+I am very interested to see what will be the performance of this
+Matt Cutler | BlocknativeToday at 12:07 AM
+You will also notice that each API payload has a section titled simDetails.
+
+This includes a detailed breakdown of our end-to-end simulation performance as measured in milliseconds. The more complex the internal transactions, the longer the simulation requires. This is linearly correlated to the gas consumed by the transaction.
+Out of curiosity – and as input to our current pricing dialogs – how much would you expect to pay for this capability?
+TihomirToday at 12:10 AM
+To be honest Matt, I've only been working on crypto for the past two weeks. Not enough to understand the subtleties of what you are offering. I will certainly take the time to inspect further. Can I get back to you in a couple of days time?
+Matt Cutler | BlocknativeToday at 12:10 AM
+Of course
+TihomirToday at 12:11 AM
+Thank you kindly for your help
+Sorry if I interrupted you, you were writting..
+Matt Cutler | BlocknativeToday at 12:29 AM
+All good.
+Very busy on this end at the moment!
+Oh. And welcome to the Ethereum ecosystem! It's nice to have you here. :slight_smile: How did you learn about Blocknative?
+TihomirToday at 12:41 AM
+Thank you, I'm glad to be here. Blockchain is definitely the future, and Ethereum is very hot right now. I found out about Blocknative from one of my friends. I'll ask him where he found next time I see him. Personally, I've tested almost a dozen different blockchain data providers and Blocknative is simply the fastest.
+I won't keep you any longer
+Thanks again, and cheers! :slight_smile:

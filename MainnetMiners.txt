@@ -1,0 +1,64 @@
+Ethermine - FIFO
+Babel Pool - FIFO
+2Miners: SOLO - 
+Hiveon Pool - FIFO
+F2Pool - LIFO
+Spark Pool - FIFO
+MiningPoolHub - FIFO
+zhizhu.top - FIFO
+BeePool - LIFO
+Nanopool - FIFO
+BTC.com Pool - 
+2Miners: PPLNS - FIFO
+UUPool - FIFO
+xnpool - FIFO
+0x3f0ee622f9e89df9db62c35cae55d57c56fd56f6 - LIFO
+0xee2FE52A8E7613A58B1da98A192eF37d2076B93d - 
+0x6ebaf477f83e055589c1188bcc6ddccd8c9b131a - FIFO
+
+Out of 1000
+Spark Pool - 245
+Ethermine - 212
+F2Pool - 96
+Hiveon Pool - 68
+zhizhu.top - 66
+Nanopool - 47
+Babel Pool - 29
+BeePool - 26
+UUPool - 22
+2Miners: PPLNS - 20
+MiningPoolHub - 19
+0x45a36a8e118c37e4c47ef4ab827a7c9e579e11e2 - 17
+0x6ebaf477f83e055589c1188bcc6ddccd8c9b131a - 16
+xnpool - 12
+0xee2fe52a8e7613a58b1da98a192ef37d2076b93d - 11
+0x3f0ee622f9e89df9db62c35cae55d57c56fd56f6 - 11
+0x2f731c3e8cd264371ffdb635d07c14a6303df52a - 10
+0x1b50e8779040b182cc2322079144d225b0361b75 - 8
+Mining Express - 8
+0xe72f79190bc8f92067c6a62008656c6a9077f6aa - 7
+firepool - 6
+EzilPool 2 - 5
+2Miners: SOLO - 3
+SUM = 964
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,5 @@
+./geth --cache 4096 --rpc --rpcaddr "127.0.0.1" --rpccorsdomain "*" --rpcport "8545" --rpcapi "db, eth, net, web3, personal" --ws --wsport 8546 --wsaddr "127.0.0.1" --wsorigins "*" --wsapi "web3, eth" --maxpeers=100
+geth --datadir=./chaindata --rpc --rpcapi="eth,net,rpc,web3,txpool,personal,debug,account" --rpccorsdomain='*' --port 30303 --txpool.globalslots=250000 --txpool.globalqueue=50000 console
+
+
+geth --goerli --datadir=./chaindata --cache 4096 --rpc --rpcaddr "127.0.0.1" --rpccorsdomain "*" --rpcport "8545" --rpcapi "db, eth, net, web3, personal" --ws --wsport 8546 --wsaddr "127.0.0.1" --wsorigins "*" --wsapi "web3, eth" --maxpeers=100

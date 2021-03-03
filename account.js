@@ -68,6 +68,7 @@ module.exports = class Account {
     console.log("\x1b[42m%s\x1b[0m", "LIQUIDITY SENT "+tx.hash);
     const startTime = Date.now();
     const trxReceipt = await tx.wait();
+    console.log(trxReceipt)
     Stat.add({addLiquidityInProgress : false});
     Stat.add({addLiquidityBlock : trxReceipt.blockNumber});
     Stat.add({addLiquidityPosition : trxReceipt.transactionIndex});
@@ -78,7 +79,7 @@ module.exports = class Account {
     return await this.signer.getTransactionCount();
   }
 
-  async swapExactETHForTokensOnInitialAddLiquidity(decodedData, transaction, nonce) {
+  async swapExactETHForTokensOnInitialAddLiquidity(decodedData, transaction,offset,which) {
     console.log("\x1b[44m%s\x1b[0m", "swapExactETHForTokens " + Date.now());
     const { token, weth, web3 } = Common.get();
     const path = [weth.address, token.address];
@@ -100,15 +101,16 @@ module.exports = class Account {
       {
         value:inputAmountHex,
         gasPrice: transaction.gasPrice,
-        gasLimit: 200000,
-        nonce
+        gasLimit: 200000
       }
     );
     console.log("\x1b[44m%s\x1b[0m", "SWAP SENT "+tx.hash);
     const trxReceipt = await tx.wait();
-    console.log("Gas used: "+trxReceipt.gasUsed.toNumber())
-    console.log("\x1b[44m%s\x1b[0m", "swapExactETHForTokens MINED "+ !!trxReceipt.status + " BLOCK NUMBER:" + trxReceipt.blockNumber + " POSITION: "+trxReceipt.transactionIndex);
     while(Stat.get().addLiquidityInProgress) await sleep(100);
+   // console.log(trxReceipt)
+    console.log("\x1b[44m%s\x1b[0m", "swapExactETHForTokens "+tx.hash +" MINED "+ !!trxReceipt.status + " BLOCK NUMBER:" + trxReceipt.blockNumber + " POSITION: "+trxReceipt.transactionIndex+" STARTED: "+which);
+    console.log("Gas used: "+trxReceipt.gasUsed.toNumber())
+    console.log("Offset: "+offset)
     let stat = Stat.get();
     if(stat.addLiquidityInProgress){
       console.log("\x1b[31m%s\x1b[0m", "ADD LIQUIDITY STILL IN PROGRESS!");
