@@ -1,0 +1,31 @@
+{
+  "name": "uniswap-bot-e2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tculig/uniswap-bot-e2.git"
+  },
+  "author": "Tihomir Culig",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tculig/uniswap-bot-e2/issues"
+  },
+  "homepage": "https://github.com/tculig/uniswap-bot-e2#readme",
+  "dependencies": {
+    "@uniswap/sdk": "3.0.3-beta.1",
+    "abi-decoder": "^2.4.0",
+    "bnc-sdk": "^3.1.1",
+    "dotenv": "^8.2.0",
+    "ethers": "5.0.8",
+    "mysql": "^2.18.1",
+    "node-fetch": "^2.6.1",
+    "sound-play": "^1.1.0",
+    "web3": "1.2.1",
+    "ws": "^7.4.3"
+  }
+}
