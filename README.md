@@ -1,4 +1,4 @@
-# uniswap-bot-e2
+# slavko-piano-bot
 Use instructions:
 1. Download zip from github
 2. Extract to some location on HDD
