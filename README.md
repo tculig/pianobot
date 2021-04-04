@@ -5,6 +5,6 @@ Use instructions:
 3. Put your configuration in the .env file
 4. Install nodejs from https://nodejs.org/en/download/
 5. Open command promt in the folder with package.json file 
-6. Run command "npm install"
-7. If npm install fails, run "npm install -g yarn", then run "yarn install"
-8. Run "node index.js" 
+6. Run command "npm install -g yarn"
+7. Run command "yarn install"
+8. Run command "node index.js" 
