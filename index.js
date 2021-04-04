@@ -118,13 +118,12 @@ async function run() {
 
 function setupSound() {
   console.log(
-    "In 3 seconds you will hear 3 chimes. Adjust speaker volume to desired level."
+    "In 3 seconds you will hear 2 chimes. Adjust speaker volume to desired level."
   );
   setTimeout(() => console.log("\x07"), 5000);
   setTimeout(() => console.log("\x07"), 6250);
-  setTimeout(() => console.log("\x07"), 7500);
   
 }
 
-//setupSound();
+setupSound();
 run();
